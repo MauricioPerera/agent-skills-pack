@@ -4,6 +4,8 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
+> **Empirical retrieval benchmark**: 7 / 7 agent intents matched their intended skill as top-1 against this pack via Cloudflare Workers AI's `bge-base-en-v1.5` (768-dim). Mean top-1 score 0.745, mean margin to top-2 +0.134. Full table: [agent-skills-cli/BENCHMARK.md](https://github.com/MauricioPerera/agent-skills-cli/blob/main/BENCHMARK.md).
+
 ## What's in here
 
 7 production-ready skills, each demonstrating a different pattern from the spec:
