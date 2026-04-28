@@ -100,15 +100,25 @@ This pack is MIT-licensed and intended to be forked. To make it yours:
 
 1. Fork the repo.
 2. Edit / add / remove skills in `skills/`.
-3. Update `llms.txt` and `skills-index.json` to match.
-4. Validate everything:
+3. Update `llms.txt`. (Skip `skills-index.json` — `agent-skills publish` rebuilds it for you.)
+4. **Validate + regenerate `skills-index.json` + tag** in one go (v0.8.0+):
+
    ```bash
-   for f in skills/*/SKILL.md; do agent-skills validate "$f" || break; done
+   # Dry-run first
+   agent-skills publish --check-only
+
+   # Apply: regenerates skills-index.json and creates a signed git tag
+   agent-skills publish --tag v1.0.0 --sign
+   git push --follow-tags
    ```
-5. Tag your fork (`git tag v1.0.0`) and push.
-6. Add the GitHub topic `agent-skills` to your fork.
+
+   `publish` validates every `SKILL.md` against the spec, **preserves any hand-crafted summaries** in your existing index, and is **idempotent** (a no-op if nothing changed).
+
+5. Add the GitHub topic `agent-skills` to your fork.
 
 Your fork is now a discoverable skill pack on its own. No registry needed.
+
+This pack itself is published with `agent-skills publish` — running it on a fresh checkout is a no-op (`0 added, 0 updated, 7 unchanged`).
 
 ## Sister projects
 
