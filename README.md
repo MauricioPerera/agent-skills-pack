@@ -28,9 +28,15 @@ Each is a complete, validated `SKILL.md` with frontmatter + human-readable body.
 
 ## Install into a skill bank
 
-### With [`agent-skills-cli`](https://github.com/MauricioPerera/agent-skills-cli) (when sync ships in v0.2.0):
+### With [`agent-skills-cli`](https://github.com/MauricioPerera/agent-skills-cli) (v0.5.0+):
+
+Until the CLI is published to npm at v1.0, install from the GitHub release:
 
 ```bash
+git clone --depth 1 --branch v0.5.0 https://github.com/MauricioPerera/agent-skills-cli
+cd agent-skills-cli && npm install && npm run build && npm link
+
+# Then sync this pack
 agent-skills sync github.com/MauricioPerera/agent-skills-pack@v1.0.0
 ```
 
@@ -55,13 +61,7 @@ agent_query "I need to fetch a URL" → returns http-get skill
 ### Validate any single skill before adopting
 
 ```bash
-npx agent-skills-cli validate \
-  https://cdn.jsdelivr.net/gh/MauricioPerera/agent-skills-pack@v1.0.0/skills/http-get/SKILL.md
-```
-
-(Note: `agent-skills-cli` v0.2.0-alpha currently validates local files; future versions will accept URLs directly. Today, fetch then validate:)
-
-```bash
+# Fetch the skill, then validate locally with the CLI installed above
 curl -fsSL https://cdn.jsdelivr.net/gh/MauricioPerera/agent-skills-pack@v1.0.0/skills/http-get/SKILL.md \
   > /tmp/skill.md
 agent-skills validate /tmp/skill.md
