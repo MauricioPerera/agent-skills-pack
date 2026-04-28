@@ -3,6 +3,7 @@
 > A curated pack of practical skills for LLM agents, built on the [agent-skills specification](https://github.com/MauricioPerera/agent-skills) v0.1.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![validate](https://github.com/MauricioPerera/agent-skills-pack/actions/workflows/validate.yml/badge.svg)](https://github.com/MauricioPerera/agent-skills-pack/actions/workflows/validate.yml)
 
 > **Empirical retrieval benchmark on this corpus** (35 paraphrased intents × 7 skills):
 > - **Cloudflare bge-base-en-v1.5**: 97.1 % top-1, 100 % top-3 (cosine baseline). `bge-large-en-v1.5` perfect 35/35.
@@ -82,6 +83,15 @@ This pack is published with the standard agent-skills discovery layout:
 ## Versioning
 
 Each skill follows semver per [SPEC.md §6.1](https://github.com/MauricioPerera/agent-skills/blob/main/SPEC.md#61-skill-version-semantics). The pack itself is also semver-tagged at the repo level — pinning to `v1.0.0` gives a bit-immutable snapshot of all 7 skills.
+
+## Continuous validation
+
+Every push and every PR (including from forks) runs [`.github/workflows/validate.yml`](./.github/workflows/validate.yml) — `agent-skills publish --check-only` against the pinned CLI v0.11.0. It enforces:
+
+1. Every `skills/<id>/SKILL.md` parses + conforms to the v0.1 schema.
+2. `skills-index.json` is byte-identical to what `agent-skills publish` would generate (catches forgotten regenerations after edits).
+
+A complementary cross-repo workflow in [`agent-skills-cli`](https://github.com/MauricioPerera/agent-skills-cli/actions/workflows/e2e.yml) runs weekly and adds Ollama-backed retrieval bench parity between TS and Python implementations against this pack's [`bench-truth.jsonl`](./bench-truth.jsonl). Two layers, complementary timing: pack-CI catches structural breakage at PR time; CLI-e2e catches retrieval-quality drift over weeks.
 
 ## Patterns demonstrated
 
