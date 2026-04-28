@@ -1,0 +1,98 @@
+name: validate
+
+# Pack-side CI. Catches malformed SKILL.md or stale skills-index.json on
+# every push and every PR — including PRs from forks. Complements the
+# weekly cross-repo e2e workflow in agent-skills-cli, which catches
+# retrieval-quality drift; this workflow catches STRUCTURAL breakage at
+# the moment a contributor opens the PR, not 7 days later.
+#
+# What it validates:
+#   - Every skills/<id>/SKILL.md parses and conforms to the v0.1 schema.
+#   - skills-index.json is byte-identical to what `agent-skills publish`
+#     would generate (catches forgotten regenerations, stale summaries,
+#     missing/orphan entries).
+#
+# What it does NOT do:
+#   - Bench (no Ollama dependency here; the CLI's weekly e2e covers that).
+#   - Signature verification (orthogonal to validation).
+#   - Network calls (purely local file validation; safe for fork PRs).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  # Manual trigger from the Actions UI.
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout pack
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # Pinned to a tagged CLI release. The validation contract is fixed at
+      # the CLI version we test against; to upgrade, bump the branch ref
+      # below and re-run. Tracking @main here would let CLI changes
+      # silently retroactively-invalidate previously-valid pack contents.
+      - name: Install agent-skills CLI (pinned to v0.11.0)
+        run: |
+          git clone --depth 1 --branch v0.11.0 https://github.com/MauricioPerera/agent-skills-cli /tmp/cli
+          cd /tmp/cli
+          npm ci
+          npm run build
+          npm link
+
+      - name: Run agent-skills publish --check-only
+        run: |
+          # publish --check-only:
+          #   - Parses + validates every skills/*/SKILL.md.
+          #   - Compares the on-disk skills-index.json against what publish
+          #     WOULD regenerate. If a SKILL.md changed but the index
+          #     wasn't regenerated, .index_changed is true.
+          #   - Exits 5 on schema/parse errors; 0 otherwise.
+          # We then enforce two stricter conditions:
+          #   1. zero invalid + zero errored skills (no malformed contents)
+          #   2. .index_changed === false (publish is a no-op on this tree)
+          agent-skills publish --check-only --json | tee publish-result.json
+
+      - name: "Enforce: no invalid skills + index up-to-date"
+        run: |
+          test -f publish-result.json || { echo "::error::publish produced no JSON output"; exit 1; }
+
+          invalid=$(jq -r '.invalid + .errored' publish-result.json)
+          if [ "$invalid" != "0" ]; then
+            echo "::error::Pack contains $invalid invalid or errored skill(s) — see preceding step output."
+            exit 1
+          fi
+
+          changed=$(jq -r '.index_changed' publish-result.json)
+          if [ "$changed" = "true" ]; then
+            echo "::error::skills-index.json is out of date. Run 'agent-skills publish' locally and commit the regenerated file. Diff hint:"
+            jq -r '"  summary: " + (.added | tostring) + " added, " + (.updated | tostring) + " updated, " + (.removed | length | tostring) + " removed"' publish-result.json
+            exit 1
+          fi
+
+      - name: Pretty summary
+        if: always()
+        run: |
+          test -f publish-result.json || exit 0
+          jq -r '
+            "─── Pack validation summary ───",
+            "  total:     \(.total)",
+            "  added:     \(.added)",
+            "  updated:   \(.updated)",
+            "  unchanged: \(.unchanged)",
+            "  invalid:   \(.invalid)",
+            "  errored:   \(.errored)",
+            "",
+            "Skills:",
+            (.skills[] | "  \(if .status == "unchanged" then "·" elif .status == "added" then "+" elif .status == "updated" then "↑" elif .status == "invalid" then "✗" else "!" end) \(.id) \(.version)")
+          ' publish-result.json
