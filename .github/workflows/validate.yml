@@ -42,9 +42,9 @@ jobs:
       # the CLI version we test against; to upgrade, bump the branch ref
       # below and re-run. Tracking @main here would let CLI changes
       # silently retroactively-invalidate previously-valid pack contents.
-      - name: Install agent-skills CLI (pinned to v0.11.0)
+      - name: Install agent-skills CLI (pinned to v0.13.1)
         run: |
-          git clone --depth 1 --branch v0.11.0 https://github.com/MauricioPerera/agent-skills-cli /tmp/cli
+          git clone --depth 1 --branch v0.13.1 https://github.com/MauricioPerera/agent-skills-cli /tmp/cli
           cd /tmp/cli
           npm ci
           npm run build

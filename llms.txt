@@ -1,6 +1,6 @@
 # agent-skills-pack
 
-> A curated pack of 7 practical skills for LLM agents, demonstrating the agent-skills v0.1 specification with real, useful commands. Each skill validates against the canonical JSON schema and pairs cleanly with [`agent-skills-cli`](https://github.com/MauricioPerera/agent-skills-cli).
+> A curated pack of 7 practical skills for LLM agents, demonstrating the agent-skills specification (v0.3, SKILL.md schema_version "0.1") with real, useful commands. Each skill validates against the canonical JSON schema and pairs cleanly with [`agent-skills-cli`](https://github.com/MauricioPerera/agent-skills-cli).
 
 ## Skills
 
@@ -18,6 +18,6 @@
 
 ## About
 
-These skills follow the [agent-skills specification v0.1.1](https://github.com/MauricioPerera/agent-skills). Each demonstrates a different pattern from the spec: network allowlisting, credential isolation, args composition, applicability filtering, etc.
+These skills follow the [agent-skills specification v0.3.0](https://github.com/MauricioPerera/agent-skills) (SKILL.md schema_version "0.1" — unchanged across spec versions). Each demonstrates a different pattern from the spec: network allowlisting, credential isolation, args composition, applicability filtering, etc.
 
 License: MIT.

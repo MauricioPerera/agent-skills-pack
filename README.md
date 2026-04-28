@@ -1,6 +1,6 @@
 # `agent-skills-pack`
 
-> A curated pack of practical skills for LLM agents, built on the [agent-skills specification](https://github.com/MauricioPerera/agent-skills) v0.1.
+> A curated pack of practical skills for LLM agents, built on the [agent-skills specification](https://github.com/MauricioPerera/agent-skills) (spec v0.3, schema_version "0.1").
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![validate](https://github.com/MauricioPerera/agent-skills-pack/actions/workflows/validate.yml/badge.svg)](https://github.com/MauricioPerera/agent-skills-pack/actions/workflows/validate.yml)
@@ -30,12 +30,12 @@ Each is a complete, validated `SKILL.md` with frontmatter + human-readable body.
 
 ## Install into a skill bank
 
-### With [`agent-skills-cli`](https://github.com/MauricioPerera/agent-skills-cli) (v0.7.0+):
+### With [`agent-skills-cli`](https://github.com/MauricioPerera/agent-skills-cli) (v0.13.1+):
 
 Until the CLI is published to npm at v1.0, install from the GitHub release:
 
 ```bash
-git clone --depth 1 --branch v0.7.0 https://github.com/MauricioPerera/agent-skills-cli
+git clone --depth 1 --branch v0.13.1 https://github.com/MauricioPerera/agent-skills-cli
 cd agent-skills-cli && npm install && npm run build && npm link
 
 # Then sync this pack
@@ -86,7 +86,7 @@ Each skill follows semver per [SPEC.md §6.1](https://github.com/MauricioPerera/
 
 ## Continuous validation
 
-Every push and every PR (including from forks) runs [`.github/workflows/validate.yml`](./.github/workflows/validate.yml) — `agent-skills publish --check-only` against the pinned CLI v0.11.0. It enforces:
+Every push and every PR (including from forks) runs [`.github/workflows/validate.yml`](./.github/workflows/validate.yml) — `agent-skills publish --check-only` against the pinned CLI v0.13.1. It enforces:
 
 1. Every `skills/<id>/SKILL.md` parses + conforms to the v0.1 schema.
 2. `skills-index.json` is byte-identical to what `agent-skills publish` would generate (catches forgotten regenerations after edits).
