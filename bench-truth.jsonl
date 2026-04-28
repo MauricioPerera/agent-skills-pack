@@ -1,0 +1,35 @@
+{"intent": "fetch the contents of a URL", "expected": "http-get"}
+{"intent": "GET request to a webpage", "expected": "http-get"}
+{"intent": "download a json document over http", "expected": "http-get"}
+{"intent": "retrieve data from an API endpoint", "expected": "http-get"}
+{"intent": "read what's at this https url", "expected": "http-get"}
+{"intent": "POST a JSON body to an API", "expected": "http-post-json"}
+{"intent": "send JSON to a webhook endpoint", "expected": "http-post-json"}
+{"intent": "submit a JSON payload via http", "expected": "http-post-json"}
+{"intent": "make an HTTP POST with a request body", "expected": "http-post-json"}
+{"intent": "push data to a REST endpoint as JSON", "expected": "http-post-json"}
+{"intent": "open a new GitHub issue", "expected": "github-issue-create"}
+{"intent": "file a bug report on a repo", "expected": "github-issue-create"}
+{"intent": "create a ticket on GitHub", "expected": "github-issue-create"}
+{"intent": "submit an issue to a repository", "expected": "github-issue-create"}
+{"intent": "report a problem in a github project", "expected": "github-issue-create"}
+{"intent": "search for a regex pattern across files", "expected": "ripgrep-search"}
+{"intent": "find all TODO comments in the source", "expected": "ripgrep-search"}
+{"intent": "grep through a codebase for a string", "expected": "ripgrep-search"}
+{"intent": "look for pattern matches in many files", "expected": "ripgrep-search"}
+{"intent": "scan all source files for a regex", "expected": "ripgrep-search"}
+{"intent": "show me the contents of package.json", "expected": "read-file"}
+{"intent": "open a file from disk and print it", "expected": "read-file"}
+{"intent": "cat the README", "expected": "read-file"}
+{"intent": "load a local text file", "expected": "read-file"}
+{"intent": "display what's inside a file path", "expected": "read-file"}
+{"intent": "extract a field from JSON data", "expected": "json-query"}
+{"intent": "query JSON with a path expression", "expected": "json-query"}
+{"intent": "pluck the .name field out of this object", "expected": "json-query"}
+{"intent": "filter a JSON array by a property", "expected": "json-query"}
+{"intent": "use jq-like syntax to traverse JSON", "expected": "json-query"}
+{"intent": "encode a string as base64", "expected": "base64-encode"}
+{"intent": "create an Authorization header value", "expected": "base64-encode"}
+{"intent": "make a Basic Auth credential", "expected": "base64-encode"}
+{"intent": "convert text to base64", "expected": "base64-encode"}
+{"intent": "build a base64-encoded token", "expected": "base64-encode"}

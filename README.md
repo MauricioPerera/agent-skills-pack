@@ -4,11 +4,12 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-> **Empirical retrieval benchmark on this corpus** (35 paraphrased intents × 7 skills, live Cloudflare Workers AI):
-> - **Cosine baseline**: 97.1 % top-1, 100 % top-3 across 3 embedding models. `bge-large-en-v1.5` perfect 35/35.
-> - **Under 50× concentrated-usage stress** (the adversarial case): naive global rerank collapses to **34.3 %** top-1 — documented failure mode of naive count-based rerank. **v0.5.0 intent-conditional rerank holds at 100 %** by filtering past intents by cosine similarity to the current query.
+> **Empirical retrieval benchmark on this corpus** (35 paraphrased intents × 7 skills):
+> - **Cloudflare bge-base-en-v1.5**: 97.1 % top-1, 100 % top-3 (cosine baseline). `bge-large-en-v1.5` perfect 35/35.
+> - **Local Ollama embeddinggemma**: 97.1 % top-1, 100 % top-3 (live, mean margin +0.175).
+> - **Under 50× concentrated-usage stress**: naive global rerank collapses to 34.3 % top-1 (documented failure mode); v0.5.0 intent-conditional rerank holds at 100 %.
 >
-> Full methodology, all 5 rerank strategies compared, raw run JSON: [agent-skills-cli/BENCHMARK.md](https://github.com/MauricioPerera/agent-skills-cli/blob/main/BENCHMARK.md).
+> **Reproduce with `agent-skills bench bench-truth.jsonl`** — the truth file is right here, [`bench-truth.jsonl`](./bench-truth.jsonl). Full methodology + 5 rerank strategies compared: [agent-skills-cli/BENCHMARK.md](https://github.com/MauricioPerera/agent-skills-cli/blob/main/BENCHMARK.md).
 
 ## What's in here
 
@@ -28,16 +29,19 @@ Each is a complete, validated `SKILL.md` with frontmatter + human-readable body.
 
 ## Install into a skill bank
 
-### With [`agent-skills-cli`](https://github.com/MauricioPerera/agent-skills-cli) (v0.5.0+):
+### With [`agent-skills-cli`](https://github.com/MauricioPerera/agent-skills-cli) (v0.7.0+):
 
 Until the CLI is published to npm at v1.0, install from the GitHub release:
 
 ```bash
-git clone --depth 1 --branch v0.5.0 https://github.com/MauricioPerera/agent-skills-cli
+git clone --depth 1 --branch v0.7.0 https://github.com/MauricioPerera/agent-skills-cli
 cd agent-skills-cli && npm install && npm run build && npm link
 
 # Then sync this pack
 agent-skills sync github.com/MauricioPerera/agent-skills-pack@v1.0.0
+
+# Verify retrieval works on YOUR provider/model with the bundled truth file:
+agent-skills bench bench-truth.jsonl
 ```
 
 ### Manually today (any skill-bank-conformant runtime):
