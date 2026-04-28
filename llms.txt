@@ -1,0 +1,23 @@
+# agent-skills-pack
+
+> A curated pack of 7 practical skills for LLM agents, demonstrating the agent-skills v0.1 specification with real, useful commands. Each skill validates against the canonical JSON schema and pairs cleanly with [`agent-skills-cli`](https://github.com/MauricioPerera/agent-skills-cli).
+
+## Skills
+
+- [HTTP GET request](https://cdn.jsdelivr.net/gh/MauricioPerera/agent-skills-pack@v1.0.0/skills/http-get/SKILL.md): fetch the contents of a URL.
+- [HTTP POST with JSON body](https://cdn.jsdelivr.net/gh/MauricioPerera/agent-skills-pack@v1.0.0/skills/http-post-json/SKILL.md): POST structured data to a JSON-accepting endpoint.
+- [Create a GitHub issue](https://cdn.jsdelivr.net/gh/MauricioPerera/agent-skills-pack@v1.0.0/skills/github-issue-create/SKILL.md): file an issue via `gh` CLI with full credential isolation.
+- [Search code with ripgrep](https://cdn.jsdelivr.net/gh/MauricioPerera/agent-skills-pack@v1.0.0/skills/ripgrep-search/SKILL.md): find patterns across a codebase.
+- [Read a file](https://cdn.jsdelivr.net/gh/MauricioPerera/agent-skills-pack@v1.0.0/skills/read-file/SKILL.md): inspect file content with line cap.
+- [Query JSON with jq](https://cdn.jsdelivr.net/gh/MauricioPerera/agent-skills-pack@v1.0.0/skills/json-query/SKILL.md): extract / transform JSON.
+- [Base64 encode a string](https://cdn.jsdelivr.net/gh/MauricioPerera/agent-skills-pack@v1.0.0/skills/base64-encode/SKILL.md): convert string to base64.
+
+## Skills index (machine-readable)
+
+- [skills-index.json](https://cdn.jsdelivr.net/gh/MauricioPerera/agent-skills-pack@v1.0.0/skills-index.json)
+
+## About
+
+These skills follow the [agent-skills specification v0.1.1](https://github.com/MauricioPerera/agent-skills). Each demonstrates a different pattern from the spec: network allowlisting, credential isolation, args composition, applicability filtering, etc.
+
+License: MIT.
