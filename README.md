@@ -4,7 +4,11 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-> **Empirical retrieval benchmark**: 35 paraphrased agent intents (5 per skill, hand-crafted) × 3 Cloudflare Workers AI embedding models. Top-1 accuracy 97-100% per model; top-3 accuracy **100% across all 3 models**. `bge-large-en-v1.5` achieves perfect 35/35 top-1. Full table + failure analysis: [agent-skills-cli/BENCHMARK.md](https://github.com/MauricioPerera/agent-skills-cli/blob/main/BENCHMARK.md).
+> **Empirical retrieval benchmark on this corpus** (35 paraphrased intents × 7 skills, live Cloudflare Workers AI):
+> - **Cosine baseline**: 97.1 % top-1, 100 % top-3 across 3 embedding models. `bge-large-en-v1.5` perfect 35/35.
+> - **Under 50× concentrated-usage stress** (the adversarial case): naive global rerank collapses to **34.3 %** top-1 — documented failure mode of naive count-based rerank. **v0.5.0 intent-conditional rerank holds at 100 %** by filtering past intents by cosine similarity to the current query.
+>
+> Full methodology, all 5 rerank strategies compared, raw run JSON: [agent-skills-cli/BENCHMARK.md](https://github.com/MauricioPerera/agent-skills-cli/blob/main/BENCHMARK.md).
 
 ## What's in here
 
