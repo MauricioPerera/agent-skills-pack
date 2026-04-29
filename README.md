@@ -1,9 +1,19 @@
 # `agent-skills-pack`
 
-> A curated pack of practical skills for LLM agents, built on the [agent-skills specification](https://github.com/MauricioPerera/agent-skills) (spec v0.3, schema_version "0.1").
+> A curated pack of practical skills for LLM agents, built on the [agent-skills specification](https://github.com/MauricioPerera/agent-skills) (spec v1.2, schema_version "0.1" / "0.2").
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![validate](https://github.com/MauricioPerera/agent-skills-pack/actions/workflows/validate.yml/badge.svg)](https://github.com/MauricioPerera/agent-skills-pack/actions/workflows/validate.yml)
+
+## What's new in v2.2.0
+
+- **`read-file` v2.0.0** and **`ripgrep-search` v2.0.0** adopt SPEC v1.2 §2.11 — the new `filesystem` allowlist. Both declare `filesystem: ["/etc", "/var", "/home", "/tmp", "/usr"]` so v2 sandboxed banks can finally execute them against real host paths without breaking the spec's read/write split (writes still go exclusively to `$AGENT_SCRATCH`).
+- Pre-v2.2 these two skills were architecturally broken under `@rckflr/agent-skills-cli` v2.0+ — the v1.1 sandbox restricted FS to scratch-only and there was no opt-in mechanism. Closes that gap.
+
+## What's new in v2.1.0
+
+- **`github-issue-create` v2.0.0** ships a pack-distributed CustomCommand (`command.js`) per SPEC v1.1 §3.4. The skill no longer requires a host `gh` binary — the CustomCommand wraps the GitHub REST API directly and reads the token from `$GH_TOKEN` / `$GITHUB_TOKEN` at exec time. Compatible with the v2 sandbox runtime.
+- **`json-query` v2.0.0** takes literal JSON via stdin (`printf '%s' {input} | jq {filter}`) instead of a file path — better fit for the LLM-in-the-loop use case where the agent passes the JSON value inline.
 
 > **Empirical retrieval benchmark on this corpus** (35 paraphrased intents × 7 skills):
 > - **Cloudflare bge-base-en-v1.5**: 97.1 % top-1, 100 % top-3 (cosine baseline). `bge-large-en-v1.5` perfect 35/35.
@@ -16,34 +26,35 @@
 
 7 production-ready skills, each demonstrating a different pattern from the spec:
 
-| Skill | Demonstrates |
-|---|---|
-| [`http-get`](skills/http-get/SKILL.md) | basic curl, args validation, network allowlist |
-| [`http-post-json`](skills/http-post-json/SKILL.md) | object-typed args, JSON encoding into shell args |
-| [`github-issue-create`](skills/github-issue-create/SKILL.md) | **full credential isolation** — no token reference in template |
-| [`ripgrep-search`](skills/ripgrep-search/SKILL.md) | applicable_when filter, complex regex args |
-| [`read-file`](skills/read-file/SKILL.md) | minimal skill, simplest baseline |
-| [`json-query`](skills/json-query/SKILL.md) | string-arg with permissive pattern, idempotent transform |
-| [`base64-encode`](skills/base64-encode/SKILL.md) | pure shell, zero-network skill |
+| Skill | Version | schema | Demonstrates |
+|---|---|---|---|
+| [`http-get`](skills/http-get/SKILL.md) | 1.0.0 | 0.1 | basic curl, args validation, network allowlist (`https://*` wildcard) |
+| [`http-post-json`](skills/http-post-json/SKILL.md) | 1.0.0 | 0.1 | object-typed args, JSON encoding into shell args |
+| [`github-issue-create`](skills/github-issue-create/SKILL.md) | **2.0.0** | 0.1 | **pack-distributed CustomCommand** (SPEC v1.1 §3.4) + full credential isolation |
+| [`ripgrep-search`](skills/ripgrep-search/SKILL.md) | **2.0.0** | **0.2** | **filesystem allowlist** (SPEC v1.2 §2.11) — host-FS read sandbox |
+| [`read-file`](skills/read-file/SKILL.md) | **2.0.0** | **0.2** | **filesystem allowlist** (SPEC v1.2 §2.11) — minimal skill, host-FS read |
+| [`json-query`](skills/json-query/SKILL.md) | **2.0.0** | 0.1 | literal JSON via stdin (LLM-in-the-loop friendly) |
+| [`base64-encode`](skills/base64-encode/SKILL.md) | 1.0.0 | 0.1 | pure shell, zero-network skill |
 
 Each is a complete, validated `SKILL.md` with frontmatter + human-readable body. Each is hosted at a content-addressable URL via [jsDelivr](https://www.jsdelivr.com/).
 
 ## Install into a skill bank
 
-### With [`agent-skills-cli`](https://github.com/MauricioPerera/agent-skills-cli) (v0.13.1+):
-
-Until the CLI is published to npm at v1.0, install from the GitHub release:
+### With [`@rckflr/agent-skills-cli`](https://www.npmjs.com/package/@rckflr/agent-skills-cli) v2.2.0+ (npm-published):
 
 ```bash
-git clone --depth 1 --branch v0.13.1 https://github.com/MauricioPerera/agent-skills-cli
-cd agent-skills-cli && npm install && npm run build && npm link
+npm install -g @rckflr/agent-skills-cli
 
-# Then sync this pack
-agent-skills sync github.com/MauricioPerera/agent-skills-pack@v1.0.0
+# Sync the latest release (resolves v2.2.0 → commit SHA → fetches from jsdelivr)
+agent-skills sync github.com/MauricioPerera/agent-skills-pack@v2.2.0
 
 # Verify retrieval works on YOUR provider/model with the bundled truth file:
 agent-skills bench bench-truth.jsonl
 ```
+
+> **Why v2.2.0+ of the CLI?** The pack at v2.2 declares `schema_version: "0.2"` on two skills (read-file, ripgrep-search) for the new `filesystem` allowlist (SPEC §2.11). v2.1 banks reject `0.2` skills as "unknown schema". v2.2 banks accept both `0.1` and `0.2`.
+
+> **Want the pre-v2.2 set?** `git clone --branch v2.1.0` and use CLI v2.1+. v1.0.0 of the pack is also still on jsdelivr but predates `command.js` and `filesystem` — only useful for v0.x banks.
 
 ### Manually today (any skill-bank-conformant runtime):
 
