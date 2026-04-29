@@ -1,15 +1,18 @@
 ---
 schema_version: "0.1"
 id: "json-query"
-version: "1.0.0"
+version: "2.0.0"
 title: "Query JSON with jq"
-description: "Applies a jq filter to a JSON input and writes the result to stdout. Input can be a file path or stdin (passed as the {input} arg)."
-use_when: "the user wants to extract, transform, or reshape JSON — pull specific fields, filter arrays, compute aggregates, reformat structure"
+description: "Applies a jq filter to a literal JSON value and writes the result to stdout. Pass the JSON as a string in the {input} arg — no file paths."
+use_when: "the user wants to extract, transform, or reshape literal JSON — pull specific fields, filter arrays, compute aggregates, reformat structure"
 
-# Both args are positional to jq. Filter is single-quoted by the bank
-# (jq syntax survives intact); input is passed as a single arg (file path
-# or '-' for stdin). The bank's quoting handles paths with spaces.
-command_template: "jq {filter} {input}"
+# v2: input is the JSON CONTENT (string), not a file path. Piped through
+# stdin so the agent can pass JSON that the LLM produced inline without
+# first writing it to a file. v1's "jq {filter} {input}" treated input as
+# a filename which the agent rarely has — a v2 sandbox doesn't expose
+# host paths anyway. Filter is single-quoted by the bank's substitution
+# (jq syntax survives intact); input is shell-quoted and piped.
+command_template: "printf '%s' {input} | jq {filter}"
 
 args:
   filter:
@@ -18,8 +21,8 @@ args:
     pattern: "^.{1,4096}$"   # any non-empty up to 4KB
   input:
     type: string
-    description: "input source: file path, or '-' to read from stdin"
-    pattern: "^[^\\n\\r;|&$`]+$"
+    description: "the JSON value to query, as a literal string (e.g., '{\"id\":42}', '[1,2,3]'). Up to 1MB."
+    pattern: "^[\\s\\S]{1,1048576}$"   # any chars including newlines, up to 1MB
 
 license: "MIT"
 author:
@@ -39,16 +42,16 @@ applicable_when:
   shell_commands_present: ["jq"]
 
 examples:
-  - intent: "extract every 'name' field from a list of users in users.json"
-    command: "jq '.[] | .name' 'users.json'"
-  - intent: "count items in a JSON array from a file"
-    command: "jq '. | length' 'data.json'"
-  - intent: "extract only the open issues from a github API response"
-    command: "jq '.[] | select(.state == \"open\") | {number, title}' 'issues.json'"
-  - intent: "reshape API response to keep only id and email"
-    command: "jq '.users | map({id, email})' 'response.json'"
-  - intent: "read JSON from stdin and pretty-print indented"
-    command: "jq '.' '-'"
+  - intent: "extract every 'name' field from this list of users [{\"name\":\"Alice\"},{\"name\":\"Bob\"}]"
+    command: "printf '%s' '[{\"name\":\"Alice\"},{\"name\":\"Bob\"}]' | jq '.[] | .name'"
+  - intent: "count items in the JSON array [1,2,3,4,5]"
+    command: "printf '%s' '[1,2,3,4,5]' | jq '. | length'"
+  - intent: "extract just the .id field from {\"id\":42,\"name\":\"alpha\"}"
+    command: "printf '%s' '{\"id\":42,\"name\":\"alpha\"}' | jq '.id'"
+  - intent: "reshape {\"users\":[{\"id\":1,\"email\":\"a@x\"}]} to keep only id and email"
+    command: "printf '%s' '{\"users\":[{\"id\":1,\"email\":\"a@x\"}]}' | jq '.users | map({id, email})'"
+  - intent: "pretty-print compact JSON {\"a\":1,\"b\":[2,3]}"
+    command: "printf '%s' '{\"a\":1,\"b\":[2,3]}' | jq '.'"
 ---
 
 # Query JSON with jq
@@ -84,13 +87,16 @@ By default, jq output is pretty-printed with 2-space indentation. Use `-c` (comp
 
 - **Parse error in input**: `jq: error: Cannot iterate over null` etc. — jq diagnostic on stderr, exit 5.
 - **Invalid filter syntax**: `jq: error: ...` at compile time, exit 3.
-- **File not found**: `jq: error: Could not open file '<path>': No such file or directory`, exit 2.
 
 The skill does NOT remap jq's exit codes; the agent SHOULD interpret them per jq's man page.
+
+## Migration from v1
+
+v1 took `input` as a file path (`jq {filter} {input}`); v2 takes `input` as the literal JSON value piped via stdin. The change makes the skill work for the dominant agent use case — passing JSON the LLM produced or received from another skill, without needing host filesystem access (which the v2 sandbox doesn't expose anyway). If you need to query a JSON file on disk, read it with `read-file` first and pass the result here.
 
 ## Caveats
 
 - The `filter` arg's pattern is permissive (any string up to 4KB). jq syntax includes characters like `|`, `(`, `)`, `[`, `]`, `.`, `\`, `"` — all of which the bank's single-quoting handles correctly. Hostile filter values are still potentially problematic if they contain logic like `system("rm -rf /")` (jq has a `--exec` flag, but it's NOT enabled in the default invocation). The agent SHOULD review filter strings before execution.
-- Streaming JSON (very large files) is supported via `jq --stream`; not exposed in this skill.
-- For non-JSON input, jq fails with a parse error. Combine with `read-file` + manual JSON validation if uncertain.
-- For arbitrary computation beyond jq's scope (e.g., regex on field values), pipe through a second tool: `jq '...' file.json | grep pattern`.
+- The `input` arg is capped at 1MB. For multi-megabyte JSON, query upstream (file → jq stream) instead of materialising the full string in the bank.
+- For non-JSON input, jq fails with a parse error.
+- For arbitrary computation beyond jq's scope (e.g., regex on field values), chain skills: this one's stdout is parseable as JSON for the next.
