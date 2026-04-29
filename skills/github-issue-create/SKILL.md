@@ -1,14 +1,16 @@
 ---
 schema_version: "0.1"
 id: "github-issue-create"
-version: "1.0.0"
+version: "2.0.0"
 title: "Create a GitHub issue"
-description: "Creates a new GitHub issue in a specified repository using the gh CLI. Authentication is delegated to gh's own credential system — the agent never sees the token."
+description: "Creates a new GitHub issue in a specified repository. v2 ships a pack-distributed CustomCommand (command.js) that calls the GitHub REST API directly — no host gh CLI required. Authentication via $GH_TOKEN; the agent never sees the credential."
 use_when: "the user wants to file a bug, feature request, or task as a GitHub issue in a repository they have write access to"
 
-# The gh CLI reads $GH_TOKEN (or its keyring config) at exec time.
-# The bank only substitutes {placeholders} — it does NOT touch $GH_TOKEN.
-# The agent emits this command without ever seeing the credential.
+# v2 dispatches to the gh CustomCommand from command.js next to this
+# SKILL.md (spec v1.1 §3.4). The bank's just-bash runtime does NOT
+# expose the host gh binary; the CustomCommand wraps the GitHub API
+# directly. $GH_TOKEN is read from env at exec time and never enters
+# the LLM context (P1 invariant preserved).
 command_template: "gh issue create --repo {repo} --title {title} --body {body}"
 
 args:
@@ -36,14 +38,16 @@ tags: ["github", "gh", "issue", "tracker", "bug-report"]
 
 shell: "bash"
 idempotent: false   # creating an issue is not idempotent
-required_commands: ["gh"]
-required_env: []    # gh reads its own credentials; no env var visible to the skill
+# v2 ships its own gh CustomCommand in command.js — no host gh binary needed.
+required_commands: []
+required_env: ["GH_TOKEN"]
+optional_env: ["GITHUB_TOKEN"]   # falls back to GITHUB_TOKEN if GH_TOKEN unset
 network:
   - "https://api.github.com/"
-  - "https://github.com/"
 
-applicable_when:
-  shell_commands_present: ["gh"]
+# applicable_when intentionally omitted in v2: the gh wrapper is provided
+# by command.js, not the host. The only host requirement is having one of
+# GH_TOKEN / GITHUB_TOKEN set, which is checked at exec time.
 
 examples:
   - intent: "open an issue in MauricioPerera/agent-skills called 'Add Korean translation'"
