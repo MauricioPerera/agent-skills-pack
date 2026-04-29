@@ -10,50 +10,50 @@
     "type": "git",
     "repo": "github.com/MauricioPerera/agent-skills-pack",
     "default_branch": "main",
-    "latest_release": "v2.1.0"
+    "latest_release": "v2.2.0"
   },
   "url_template": "https://cdn.jsdelivr.net/gh/MauricioPerera/agent-skills-pack@{ref}/skills/{path}/SKILL.md",
   "skills": [
     {
       "id": "http-get",
       "version": "1.0.0",
-      "url": "https://cdn.jsdelivr.net/gh/MauricioPerera/agent-skills-pack@v2.1.0/skills/http-get/SKILL.md",
+      "url": "https://cdn.jsdelivr.net/gh/MauricioPerera/agent-skills-pack@v2.2.0/skills/http-get/SKILL.md",
       "summary": "Performs an HTTP GET request and returns the response body. Idempotent."
     },
     {
       "id": "http-post-json",
       "version": "1.0.0",
-      "url": "https://cdn.jsdelivr.net/gh/MauricioPerera/agent-skills-pack@v2.1.0/skills/http-post-json/SKILL.md",
+      "url": "https://cdn.jsdelivr.net/gh/MauricioPerera/agent-skills-pack@v2.2.0/skills/http-post-json/SKILL.md",
       "summary": "POST a JSON body to an HTTP endpoint. Demonstrates object-arg composition."
     },
     {
       "id": "github-issue-create",
       "version": "2.0.0",
-      "url": "https://cdn.jsdelivr.net/gh/MauricioPerera/agent-skills-pack@v2.1.0/skills/github-issue-create/SKILL.md",
+      "url": "https://cdn.jsdelivr.net/gh/MauricioPerera/agent-skills-pack@v2.2.0/skills/github-issue-create/SKILL.md",
       "summary": "Create a GitHub issue via gh CLI. Demonstrates full credential isolation (no secret in template)."
     },
     {
       "id": "ripgrep-search",
-      "version": "1.0.0",
-      "url": "https://cdn.jsdelivr.net/gh/MauricioPerera/agent-skills-pack@v2.1.0/skills/ripgrep-search/SKILL.md",
+      "version": "2.0.0",
+      "url": "https://cdn.jsdelivr.net/gh/MauricioPerera/agent-skills-pack@v2.2.0/skills/ripgrep-search/SKILL.md",
       "summary": "Recursive code search via ripgrep. Returns file:line:col:match."
     },
     {
       "id": "read-file",
-      "version": "1.0.0",
-      "url": "https://cdn.jsdelivr.net/gh/MauricioPerera/agent-skills-pack@v2.1.0/skills/read-file/SKILL.md",
+      "version": "2.0.0",
+      "url": "https://cdn.jsdelivr.net/gh/MauricioPerera/agent-skills-pack@v2.2.0/skills/read-file/SKILL.md",
       "summary": "Read a file's content with line-cap. Idempotent."
     },
     {
       "id": "json-query",
       "version": "2.0.0",
-      "url": "https://cdn.jsdelivr.net/gh/MauricioPerera/agent-skills-pack@v2.1.0/skills/json-query/SKILL.md",
+      "url": "https://cdn.jsdelivr.net/gh/MauricioPerera/agent-skills-pack@v2.2.0/skills/json-query/SKILL.md",
       "summary": "Apply a jq filter to JSON input. Idempotent."
     },
     {
       "id": "base64-encode",
       "version": "1.0.0",
-      "url": "https://cdn.jsdelivr.net/gh/MauricioPerera/agent-skills-pack@v2.1.0/skills/base64-encode/SKILL.md",
+      "url": "https://cdn.jsdelivr.net/gh/MauricioPerera/agent-skills-pack@v2.2.0/skills/base64-encode/SKILL.md",
       "summary": "Base64-encode a string for embedding in URLs / Authorization headers / etc."
     }
   ]

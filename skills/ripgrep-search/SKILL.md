@@ -1,9 +1,9 @@
 ---
-schema_version: "0.1"
+schema_version: "0.2"
 id: "ripgrep-search"
-version: "1.0.0"
+version: "2.0.0"
 title: "Search code with ripgrep"
-description: "Recursively searches files in a directory for a regex pattern using ripgrep. Returns matching lines with file:line:column prefixes. Respects .gitignore by default."
+description: "Recursively searches files in a directory for a regex pattern using ripgrep. Returns matching lines with file:line:column prefixes. Respects .gitignore by default. Sandboxed banks (SPEC §2.11) restrict the search root to the declared `filesystem` allowlist plus `$AGENT_SCRATCH`."
 use_when: "the user wants to find a string, regex, or symbol across multiple files in a codebase or directory tree"
 
 command_template: "rg --hidden --line-number --column --max-count={max_per_file} {pattern} {path}"
@@ -36,6 +36,17 @@ shell: "bash"
 idempotent: true
 required_commands: ["rg"]
 required_env: []
+
+# SPEC v1.2 §2.11 read allowlist. ripgrep-search is most commonly
+# invoked against project source trees; covering /home plus /tmp
+# captures the typical operator workflow without granting full
+# host access. /etc, /var, /usr also included for ops/log search.
+filesystem:
+  - "/etc"
+  - "/var"
+  - "/home"
+  - "/tmp"
+  - "/usr"
 
 applicable_when:
   shell_commands_present: ["rg"]

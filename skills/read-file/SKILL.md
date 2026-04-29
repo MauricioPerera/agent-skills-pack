@@ -1,9 +1,9 @@
 ---
-schema_version: "0.1"
+schema_version: "0.2"
 id: "read-file"
-version: "1.0.0"
+version: "2.0.0"
 title: "Read a file's content"
-description: "Reads the contents of a file from the local filesystem and writes it to stdout. Optionally limits to the first N lines."
+description: "Reads the contents of a file from the local filesystem and writes it to stdout. Optionally limits to the first N lines. Sandboxed banks (SPEC §2.11) only see paths under the declared `filesystem` allowlist plus `$AGENT_SCRATCH`."
 use_when: "the user wants to inspect the content of a specific file by path — source code, config, log excerpt, etc."
 
 # Single placeholder in argument position. The bank's single-quoting handles
@@ -13,7 +13,7 @@ command_template: "head --lines={max_lines} {path}"
 args:
   path:
     type: string
-    description: "absolute or relative path to the file"
+    description: "absolute path to the file. Must be under the skill's filesystem allowlist (e.g., /etc, /var, /home, /tmp, /usr) OR inside $AGENT_SCRATCH."
     pattern: "^[^\\n\\r;|&$`]+$"
   max_lines:
     type: integer
@@ -34,6 +34,20 @@ shell: "bash"
 idempotent: true
 required_commands: ["head"]
 required_env: []
+
+# SPEC v1.2 §2.11 read allowlist. Covers the host directories that
+# agent-style use cases typically touch: config, logs, user files,
+# tmp scratch, and system-installed binaries' resources. Sandboxed
+# banks block reads outside these dirs (and $AGENT_SCRATCH).
+# Operators wanting wider access should ship a custom skill with a
+# broader allowlist; we don't ship "/" — that's an explicit unsafe
+# decision per §2.11's design guidance.
+filesystem:
+  - "/etc"
+  - "/var"
+  - "/home"
+  - "/tmp"
+  - "/usr"
 
 applicable_when:
   shell_commands_present: ["head"]
